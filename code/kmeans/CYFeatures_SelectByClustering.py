@@ -39,7 +39,6 @@ if first_column_unique:
 else:
     warnings.warn("First column DOES NOT contain unique values.")
 
-<<<<<<< HEAD
 sum_of_distances_squared = []
 for N in range(2, num_clusters+1):
     if method == 'kmeans':
