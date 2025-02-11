@@ -51,9 +51,26 @@ for N in range(2, num_clusters+1):
     # Fit the model on the data, add the cluster assignments to a new column and get cluster centers.
     features_df = df.iloc[:, 1:].copy()
     clustering_model.fit(features_df)
-    df['cluster'] = clustering_model.predict(features_df)
+    df_N = df.copy()
+    df_N['cluster'] = clustering_model.predict(features_df)
     centroids = clustering_model.cluster_centers_
     sum_of_distances_squared.append(clustering_model.inertia_)
+
+    # Find the index of the closest row to each centroid.
+    closest_to_centroid_indices = df_N.groupby('cluster').apply(
+        lambda x: ((x.iloc[:, 1:-1] - centroids[x.name]) ** 2).sum(axis=1).idxmin()
+    ).values
+
+    df_N['is_centroid'] = df_N.index.isin(closest_to_centroid_indices)
+
+    # Select num_rows closest points across clusters.
+    df_N['distance_to_centroid'] = df_N.apply(lambda row: ((row.iloc[1:-2] - centroids[row.cluster]) ** 2).sum(), axis=1)
+    selected_indices = df_N.nsmallest(num_rows, 'distance_to_centroid').index
+    df_N['selected'] = df_N.index.isin(selected_indices)
+
+    df_N.drop(columns=['distance_to_centroid'], inplace=True)
+    output_file = Path("../../data/kmeans_result/cyfeatures_TA_{}clusters.csv".format(N))
+    df_N.to_csv(output_file, index=False)
 
 # Plot figure showing the sum of squared distances for the different number of clusters
 # From this figure, the best number of clusters to use can be determined.
@@ -63,21 +80,3 @@ plt.xlabel("Number of clusters")
 plt.ylabel("Sum of squared distances")
 plt.savefig("../../data/kmeans_result/cyfeatures_TA_number_of_clusters_graph.png")
 plt.close()
-
-# Find the index of the closest row to each centroid.
-closest_to_centroid_indices = df.groupby('cluster').apply(
-    lambda x: ((x.iloc[:, 1:-1] - centroids[x.name]) ** 2).sum(axis=1).idxmin()
-).values
-
-df['is_centroid'] = df.index.isin(closest_to_centroid_indices)
-
-# Select num_rows closest points across clusters.
-df['distance_to_centroid'] = df.apply(lambda row: ((row.iloc[1:-2] - centroids[row.cluster]) ** 2).sum(), axis=1)
-selected_indices = df.nsmallest(num_rows, 'distance_to_centroid').index
-df['selected'] = df.index.isin(selected_indices)
-
-df.drop(columns=['distance_to_centroid'], inplace=True)
-output_file = Path("../../data/kmeans_result/cyfeatures_TA_{}clusters.csv".format(n_clusters))
-df.to_csv(output_file, index=False)
-
-#print(df.tail(20))

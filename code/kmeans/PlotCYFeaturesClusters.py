@@ -22,14 +22,14 @@ else:
     palette = dict(zip(unique_clusters, (sns.color_palette("tab20", 20) + sns.color_palette("tab10", len(unique_clusters) - 20) )))
 
 # Loop over feature combinations to make the different plots
-columns = df.columns[1:-2]
+columns = df.columns[1:-3]
 column_combs = list(itertools.combinations(columns, 2))
 for comb in column_combs:
     plotx = comb[0]
     ploty = comb[1]
 
     # Create the figure
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(10, 8))
 
     # Plot non-centroids first (lower zorder).
     sns.scatterplot(
@@ -47,7 +47,11 @@ for comb in column_combs:
     plt.title(f"{ploty} vs {plotx} Colored by Cluster (Centroids Marked)")
     plt.xlabel(plotx)
     plt.ylabel(ploty)
-    plt.legend(title="Cluster", bbox_to_anchor=(1.05, 1), loc='upper left')
+
+    # Sort legend labels
+    handles, labels = plt.gca().get_legend_handles_labels()
+    labels, handles = zip(*sorted(zip(labels, handles), key=lambda t: t[0]))
+    plt.legend(handles, labels, title="Cluster", bbox_to_anchor=(1.02, 1), loc='upper left')
 
     # Show the plot.
     plt.savefig("../../data/kmeans_result/clusterplot_{}clusters_{}_vs_{}.png"
