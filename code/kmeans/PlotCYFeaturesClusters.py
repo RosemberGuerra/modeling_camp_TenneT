@@ -6,7 +6,7 @@ import itertools
 
 n_clusters = 6
 print("Making plots for {} clusters".format(n_clusters))
-input_file = Path("../../data/kmeans_result/cyfeatures_TA_{}clusters.csv".format(n_clusters))
+input_file = Path("../../data/kmeans_result/normed/cyfeatures_TA_{}clusters.csv".format(n_clusters))
 
 # Load data
 df = pd.read_csv(input_file)
@@ -44,9 +44,9 @@ for comb in column_combs:
     )
 
     # Plot settings.
-    plt.title(f"{ploty} vs {plotx} Colored by Cluster (Centroids Marked)")
-    plt.xlabel(plotx)
-    plt.ylabel(ploty)
+    plt.title(f"Normalized {ploty} vs {plotx} Colored by Cluster (Centroids Marked)")
+    plt.xlabel("Normalized "+plotx)
+    plt.ylabel("Normalized "+ploty)
 
     # Sort legend labels
     handles, labels = plt.gca().get_legend_handles_labels()
@@ -54,6 +54,6 @@ for comb in column_combs:
     plt.legend(handles, labels, title="Cluster", bbox_to_anchor=(1.02, 1), loc='upper left')
 
     # Show the plot.
-    plt.savefig("../../data/kmeans_result/clusterplot_{}clusters_{}_vs_{}.png"
+    plt.savefig("../../data/kmeans_result/normed/clusterplot_{}clusters_{}_vs_{}.png"
                 .format(n_clusters, plotx.replace(" ","_"), ploty.replace(" ","_")))
     plt.close()

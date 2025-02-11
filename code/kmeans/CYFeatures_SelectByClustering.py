@@ -5,6 +5,7 @@ import warnings
 from sklearn.cluster import KMeans
 from sklearn_extra.cluster import KMedoids
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
 
 # Settings.
 method = 'kmedoids'   # Should be chosen from ['kmeans', 'kmedoids'].
@@ -19,6 +20,10 @@ df = pd.read_csv(input_file)
 l_init = len(df)
 df.dropna(inplace=True)
 print("{}/{} rows left without NaN values".format(len(df), l_init))
+
+# Normalize values
+df_scaled = pd.DataFrame(StandardScaler().fit_transform(df[df.columns[1:]]), columns=df.columns[1:])
+df_scaled.insert(loc=0, column=df.columns[0], value=df[df.columns[0]])
 
 """
 with pd.option_context('display.max_rows', 100,
@@ -49,9 +54,9 @@ for N in range(2, num_clusters+1):
         print("Clustering method not recognized: {}!".format(method))
 
     # Fit the model on the data, add the cluster assignments to a new column and get cluster centers.
-    features_df = df.iloc[:, 1:].copy()
+    features_df = df_scaled.iloc[:, 1:].copy()
     clustering_model.fit(features_df)
-    df_N = df.copy()
+    df_N = df_scaled.copy()
     df_N['cluster'] = clustering_model.predict(features_df)
     centroids = clustering_model.cluster_centers_
     sum_of_distances_squared.append(clustering_model.inertia_)
@@ -69,7 +74,7 @@ for N in range(2, num_clusters+1):
     df_N['selected'] = df_N.index.isin(selected_indices)
 
     df_N.drop(columns=['distance_to_centroid'], inplace=True)
-    output_file = Path("../../data/kmeans_result/cyfeatures_TA_{}clusters.csv".format(N))
+    output_file = Path("../../data/kmeans_result/normed/cyfeatures_TA_{}clusters.csv".format(N))
     df_N.to_csv(output_file, index=False)
 
 # Plot figure showing the sum of squared distances for the different number of clusters
@@ -78,5 +83,5 @@ plt.plot(range(2, num_clusters+1), sum_of_distances_squared, 'o')
 plt.xticks(range(2, num_clusters+1))
 plt.xlabel("Number of clusters")
 plt.ylabel("Sum of squared distances")
-plt.savefig("../../data/kmeans_result/cyfeatures_TA_number_of_clusters_graph.png")
+plt.savefig("../../data/kmeans_result/normed/cyfeatures_TA_number_of_clusters_graph.png")
 plt.close()
