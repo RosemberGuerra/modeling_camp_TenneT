@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import itertools
 
-n_clusters = 3
+n_clusters = 6
 print("Making plots for {} clusters".format(n_clusters))
 input_file = Path("../../data/kmeans_result/cyfeatures_TA_{}clusters.csv".format(n_clusters))
 
@@ -55,5 +55,5 @@ for comb in column_combs:
 
     # Show the plot.
     plt.savefig("../../data/kmeans_result/clusterplot_{}clusters_{}_vs_{}.png"
-                .format(n_clusters, plotx, ploty))
+                .format(n_clusters, plotx.replace(" ","_"), ploty.replace(" ","_")))
     plt.close()

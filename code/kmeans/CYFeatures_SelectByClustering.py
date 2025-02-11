@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 method = 'kmedoids'   # Should be chosen from ['kmeans', 'kmedoids'].
 num_clusters = 20   # Number of clusters to create.
 num_rows = 30   # Number of representative rows to select.
-input_file = Path("../../data/PECDv4.2_NLregion_TAfeatures.csv")
+input_file = Path("../../data/PECDc4.2_NLregion_TAfeatures_Vu.csv")
 
 # Load data
 df = pd.read_csv(input_file)
