@@ -33,7 +33,7 @@ def apply_pca(X, explained_variance=0.9):
 
     return X_pca
 
-def kmedoid_climate_year(X, n_clusters):
+def kmedoid_climate_years(X, n_clusters):
     """
     Apply k-medoids clustering to select climate years.
 
@@ -52,5 +52,5 @@ def kmedoid_climate_year(X, n_clusters):
     labels = kmedoids_instance.get_clusters()
     medoids = kmedoids_instance.get_medoids()
 
-    return labels, medoids
+    return [labels, medoids]
 
