@@ -54,6 +54,8 @@ for comb in column_combs:
     plt.legend(handles, labels, title="Cluster", bbox_to_anchor=(1.02, 1), loc='upper left')
 
     # Show the plot.
+    xlab = plotx.replace(" ","_").replace("$","").replace("#","N").replace("\\","")
+    ylab = ploty.replace(" ","_").replace("$","").replace("#","N").replace("\\","")
     plt.savefig("../../data/kmeans_result/clusterplot_{}clusters_{}_vs_{}.png"
-                .format(n_clusters, plotx.replace(" ","_"), ploty.replace(" ","_")))
+                .format(n_clusters, xlab, ylab))
     plt.close()
