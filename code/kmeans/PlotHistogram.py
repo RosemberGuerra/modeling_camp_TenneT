@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 n_clusters = 6
 print(f"Making plots for {n_clusters} clusters")
-input_file = Path(f"../../data/kmeans_result/normed/cyfeatures_TA_{n_clusters}clusters.csv")
+input_file = Path(f"../../data/kmeans_result/cyfeatures_TA_{n_clusters}clusters.csv")
 
 # Load data
 df = pd.read_csv(input_file)
