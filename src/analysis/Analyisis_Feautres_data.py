@@ -48,3 +48,15 @@ for i, cluster in enumerate(cy_kmedoids[0]):
 selected_cy = df_target_2050.iloc[medoids]
 selected_cy.head()
 
+# columns names 
+col_names = df_target_2050_2use.columns
+
+from scipy.stats import ks_2samp
+
+for var in col_names:
+    stat, p_value = ks_2samp(selected_cy[var], df_target_2050_2use[var])
+    print(f"KS Test for {var}: p-value = {p_value:.4f}")
+    if p_value < 0.05:
+        print(f"  ❌ Subset is **not** representative for {var}.")
+    else:
+        print(f"  ✅ Not enough evidence to conclude **not** representative for {var}.")
