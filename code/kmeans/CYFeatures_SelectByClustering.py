@@ -10,31 +10,30 @@ from sklearn.decomposition import PCA
 
 # Settings.
 method = 'kmedoids'   # Should be chosen from ['kmeans', 'kmedoids'].
-num_clusters = 20   # Number of clusters to create.
+num_clusters = 4   # Number of clusters to create.
 num_rows = 30   # Number of representative rows to select.
-input_file = Path("../../data/PECDc4.2_NLregion_TAfeatures_Vu.csv")
+input_file = Path("../../data/features_output_selection_Years.csv")
 
 # Load data
 df = pd.read_csv(input_file)
 
+# Remove column
+if 'ModelName_1' in df.columns:
+    df.drop(columns='ModelName_1', inplace=True)
+
+# sub set selection for target year: 2050
+# select years: form 2036 to 2065
+years_2036__2065 = [i for i in range(2036, 2066)]
+df_target_2050 = df[df['Year'].isin(years_2036__2065)]
+
 # Drop NaN values
-l_init = len(df)
-df.dropna(inplace=True)
-print("{}/{} rows left without NaN values".format(len(df), l_init))
+l_init = len(df_target_2050)
+df_target_2050 = df_target_2050.dropna()
+print("{}/{} rows left without NaN values".format(len(df_target_2050), l_init))
 
 # Normalize feature values
-df_scaled = pd.DataFrame(StandardScaler().fit_transform(df[df.columns[1:]]), columns=df.columns[1:])
-
-# Apply Principal Component Analysis
-N_pca_components = 5
-pca = PCA(n_components=N_pca_components)
-pca_result = pca.fit_transform(df_scaled)
-print('Cumulative variance explained by {} principal components: {:.2%}'
-      .format(N_pca_components, np.sum(pca.explained_variance_ratio_)))
-
-indices = ["PC_{}".format(c) for c in range(1,N_pca_components+1)]
-dataset_pca = pd.DataFrame(np.abs(pca.components_), columns=df_scaled.columns, index=indices)
-dataset_pca.to_csv("../../data/kmeans_result/cyfeatures_TA_PCAoutput.csv", index=False)
+df_scaled = pd.DataFrame(StandardScaler().fit_transform(df_target_2050[df_target_2050.columns[2:]]),
+                         columns=df_target_2050.columns[2:])
 
 # Add the cy_id column back
 df_scaled.insert(loc=0, column=df.columns[0], value=df[df.columns[0]])
@@ -59,7 +58,8 @@ else:
     warnings.warn("First column DOES NOT contain unique values.")
 
 sum_of_distances_squared = []
-for N in range(2, num_clusters+1):
+#for N in range(2, num_clusters+1):
+for N in [num_clusters]:
     if method == 'kmeans':
         clustering_model = KMeans(n_clusters=N, random_state=42, n_init=10)
     elif method == 'kmedoids':
@@ -88,14 +88,16 @@ for N in range(2, num_clusters+1):
     df_N['selected'] = df_N.index.isin(selected_indices)
 
     df_N.drop(columns=['distance_to_centroid'], inplace=True)
-    output_file = Path("../../data/kmeans_result/cyfeatures_TA_{}clusters.csv".format(N))
+    output_file = Path("../../data/kmeans_result/cyfeatures_{}clusters.csv".format(N))
     df_N.to_csv(output_file, index=False)
 
+"""
 # Plot figure showing the sum of squared distances for the different number of clusters
 # From this figure, the best number of clusters to use can be determined.
 plt.plot(range(2, num_clusters+1), sum_of_distances_squared, 'o')
 plt.xticks(range(2, num_clusters+1))
 plt.xlabel("Number of clusters")
 plt.ylabel("Sum of squared distances")
-plt.savefig("../../data/kmeans_result/cyfeatures_TA_number_of_clusters_graph.png")
+plt.savefig("../../data/kmeans_result/cyfeatures_number_of_clusters_graph.png")
 plt.close()
+""";

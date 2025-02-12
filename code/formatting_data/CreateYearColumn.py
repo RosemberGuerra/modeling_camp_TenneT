@@ -1,8 +1,8 @@
 from pathlib import Path
 import pandas as pd
 
-input_file = Path("../../data/PECDc4.2_NLregion_TAfeatures_Vu.csv")
-output_file = Path("../../data/PECDc4.2_NLregion_TAfeatures_Vu_Years.csv")
+input_file = Path("../../data/features_output_selection.csv")
+output_file = Path("../../data/features_output_selection_Years.csv")
 
 
 # Read CSV file into DataFrame
