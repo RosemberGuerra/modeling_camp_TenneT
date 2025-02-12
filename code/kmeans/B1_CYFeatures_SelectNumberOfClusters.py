@@ -10,7 +10,7 @@ from sklearn.decomposition import PCA
 
 # Settings.
 method = 'kmedoids'   # Should be chosen from ['kmeans', 'kmedoids'].
-num_clusters = 4   # Number of clusters to create.
+num_clusters = 20   # Number of clusters to create.
 num_rows = 30   # Number of representative rows to select.
 input_file = Path("../../data/features_output_selection_Years.csv")
 
@@ -58,8 +58,7 @@ else:
     warnings.warn("First column DOES NOT contain unique values.")
 
 sum_of_distances_squared = []
-#for N in range(2, num_clusters+1):
-for N in [num_clusters]:
+for N in range(2, num_clusters+1):
     if method == 'kmeans':
         clustering_model = KMeans(n_clusters=N, random_state=42, n_init=10)
     elif method == 'kmedoids':
@@ -70,34 +69,14 @@ for N in [num_clusters]:
     # Fit the model on the data, add the cluster assignments to a new column and get cluster centers.
     features_df = df_scaled.iloc[:, 1:].copy()
     clustering_model.fit(features_df)
-    df_N = df_scaled.copy()
-    df_N['cluster'] = clustering_model.predict(features_df)
-    centroids = clustering_model.cluster_centers_
     sum_of_distances_squared.append(clustering_model.inertia_)
 
-    # Find the index of the closest row to each centroid.
-    closest_to_centroid_indices = df_N.groupby('cluster').apply(
-        lambda x: ((x.iloc[:, 1:-1] - centroids[x.name]) ** 2).sum(axis=1).idxmin()
-    ).values
-
-    df_N['is_centroid'] = df_N.index.isin(closest_to_centroid_indices)
-
-    # Select num_rows closest points across clusters.
-    df_N['distance_to_centroid'] = df_N.apply(lambda row: ((row.iloc[1:-2] - centroids[row.cluster]) ** 2).sum(), axis=1)
-    selected_indices = df_N.nsmallest(num_rows, 'distance_to_centroid').index
-    df_N['selected'] = df_N.index.isin(selected_indices)
-
-    df_N.drop(columns=['distance_to_centroid'], inplace=True)
-    output_file = Path("../../data/kmeans_result/cyfeatures_{}clusters.csv".format(N))
-    df_N.to_csv(output_file, index=False)
-
-"""
 # Plot figure showing the sum of squared distances for the different number of clusters
 # From this figure, the best number of clusters to use can be determined.
 plt.plot(range(2, num_clusters+1), sum_of_distances_squared, 'o')
 plt.xticks(range(2, num_clusters+1))
+plt.title("No PCA")
 plt.xlabel("Number of clusters")
 plt.ylabel("Sum of squared distances")
 plt.savefig("../../data/kmeans_result/cyfeatures_number_of_clusters_graph.png")
 plt.close()
-""";
