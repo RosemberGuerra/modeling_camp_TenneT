@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 n_clusters = 6
 print(f"Making plots for {n_clusters} clusters")
-input_file = Path(f"../../data/kmeans_result/normed/cyfeatures_TA_{n_clusters}clusters.csv")
+input_file = Path(f"../../data/kmeans_result/cyfeatures_TA_{n_clusters}clusters.csv")
 
 # Load data
 df = pd.read_csv(input_file)
@@ -15,7 +15,7 @@ for idx, col in enumerate(df.columns):
     print(f"Column {idx}: {col}")
 print()
 
-column_number = 1  # Ensure this column contains numerical data
+column_number = 2  # Ensure this column contains numerical data
 print(f"Column selected: {column_number}: {df.columns[column_number]}")
 print(df.iloc[:, column_number])
 
@@ -34,22 +34,15 @@ plt.figure(figsize=(8, 6))
 
 # Define bins
 bins = 16  # Adjust as needed
-hist_all, bin_edges = np.histogram(all_values, bins=bins)  # Compute histogram for all data
-hist_selected, _ = np.histogram(selected_values, bins=bin_edges)  # Compute for selected data
 
-# Scale selected histogram to match total count
-scale_factor = hist_all.sum() / hist_selected.sum() if hist_selected.sum() > 0 else 1
-hist_selected_scaled = hist_selected * scale_factor
-
-# Plot histograms
-plt.hist(all_values, bins=bin_edges, alpha=0.5, label=df.columns[column_number], color='blue')
-plt.hist(selected_values, bins=bin_edges, alpha=0.5, weights=[scale_factor] * len(selected_values), 
-         label='Selected Data (Scaled)', color='red')
+# Plot histograms using density=True for normalization
+plt.hist(all_values, bins=bins, alpha=0.5, label=df.columns[column_number], color='blue', density=True)
+plt.hist(selected_values, bins=bins, alpha=0.5, label='Selected Data', color='red', density=True)
 
 # Labels and legend
 plt.xlabel(df.columns[column_number])
-plt.ylabel('Frequency')
-plt.title(f'Histogram of {df.columns[column_number]}')
+plt.ylabel('Density')
+plt.title(f'Histogram of {df.columns[column_number]} (Normalized)')
 plt.legend()
 
 # Show plot
