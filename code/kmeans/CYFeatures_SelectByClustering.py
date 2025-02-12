@@ -38,7 +38,7 @@ dataset_pca = pd.DataFrame(np.abs(pca.components_), columns=df_scaled.columns, i
 
 # Add the cy_id column back
 df_scaled.insert(loc=0, column=df.columns[0], value=df[df.columns[0]])
-print(sth)
+
 """
 with pd.option_context('display.max_rows', 100,
                        'display.min_rows', 50,
