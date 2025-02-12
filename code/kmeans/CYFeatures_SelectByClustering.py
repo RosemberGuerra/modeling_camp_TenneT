@@ -34,7 +34,7 @@ print('Cumulative variance explained by {} principal components: {:.2%}'
 
 indices = ["PC_{}".format(c) for c in range(1,N_pca_components+1)]
 dataset_pca = pd.DataFrame(np.abs(pca.components_), columns=df_scaled.columns, index=indices)
-#print(dataset_pca)
+dataset_pca.to_csv("../../data/kmeans_result/cyfeatures_TA_PCAoutput.csv", index=False)
 
 # Add the cy_id column back
 df_scaled.insert(loc=0, column=df.columns[0], value=df[df.columns[0]])
