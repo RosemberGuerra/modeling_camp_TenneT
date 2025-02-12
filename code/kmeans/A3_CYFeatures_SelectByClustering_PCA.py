@@ -71,46 +71,31 @@ if first_column_unique:
 else:
     warnings.warn("First column DOES NOT contain unique values.")
 
-sum_of_distances_squared = []
-#for N in range(2, num_clusters+1):
-for N in [num_clusters]:
-    if method == 'kmeans':
-        clustering_model = KMeans(n_clusters=N, random_state=42, n_init=10)
-    elif method == 'kmedoids':
-        clustering_model = KMedoids(n_clusters=N, random_state=42)
-    else:
-        print("Clustering method not recognized: {}!".format(method))
+if method == 'kmeans':
+    clustering_model = KMeans(n_clusters=num_clusters, random_state=42, n_init=10)
+elif method == 'kmedoids':
+    clustering_model = KMedoids(n_clusters=num_clusters, random_state=42)
+else:
+    print("Clustering method not recognized: {}!".format(method))
 
-    # Fit the model on the data, add the cluster assignments to a new column and get cluster centers.
-    clustering_model.fit(scores_pca)
-    sum_of_distances_squared.append(clustering_model.inertia_)
-    df_N = df_pca.copy()
-    df_N['cluster'] = clustering_model.predict(scores_pca)
-    centroids = clustering_model.cluster_centers_
+# Fit the model on the data, add the cluster assignments to a new column and get cluster centers.
+clustering_model.fit(scores_pca)
+df_N = df_pca.copy()
+df_N['cluster'] = clustering_model.predict(scores_pca)
+centroids = clustering_model.cluster_centers_
 
-    # Find the index of the closest row to each centroid.
-    closest_to_centroid_indices = df_N.groupby('cluster').apply(
-        lambda x: ((x.iloc[:, 1:-1] - centroids[x.name]) ** 2).sum(axis=1).idxmin()
-    ).values
+# Find the index of the closest row to each centroid.
+closest_to_centroid_indices = df_N.groupby('cluster').apply(
+    lambda x: ((x.iloc[:, 1:-1] - centroids[x.name]) ** 2).sum(axis=1).idxmin()
+).values
+df_N['is_centroid'] = df_N.index.isin(closest_to_centroid_indices)
 
-    df_N['is_centroid'] = df_N.index.isin(closest_to_centroid_indices)
+# Select num_rows closest points across clusters.
+df_N['distance_to_centroid'] = df_N.apply(lambda row: ((row.iloc[1:-2] - centroids[row.cluster]) ** 2).sum(), axis=1)
+selected_indices = df_N.nsmallest(num_rows, 'distance_to_centroid').index
+df_N['selected'] = df_N.index.isin(selected_indices)
 
-    # Select num_rows closest points across clusters.
-    df_N['distance_to_centroid'] = df_N.apply(lambda row: ((row.iloc[1:-2] - centroids[row.cluster]) ** 2).sum(), axis=1)
-    selected_indices = df_N.nsmallest(num_rows, 'distance_to_centroid').index
-    df_N['selected'] = df_N.index.isin(selected_indices)
+df_N.drop(columns=['distance_to_centroid'], inplace=True)
+output_file = Path("../../data/kmeans_result/cyfeatures_{}clusters_PCA.csv".format(num_clusters))
+df_N.to_csv(output_file, index=False)
 
-    df_N.drop(columns=['distance_to_centroid'], inplace=True)
-    output_file = Path("../../data/kmeans_result/cyfeatures_{}clusters_PCA.csv".format(N))
-    df_N.to_csv(output_file, index=False)
-
-"""
-# Plot figure showing the sum of squared distances for the different number of clusters
-# From this figure, the best number of clusters to use can be determined.
-plt.plot(range(2, num_clusters+1), sum_of_distances_squared, 'o')
-plt.xticks(range(2, num_clusters+1))
-plt.xlabel("Number of clusters")
-plt.ylabel("Sum of squared distances")
-#plt.savefig("../../data/kmeans_result/cyfeatures_number_of_clusters_graph_PCA.png")
-plt.close()
-""";
