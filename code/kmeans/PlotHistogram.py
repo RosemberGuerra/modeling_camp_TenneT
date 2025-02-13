@@ -3,14 +3,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Settings
-n_clusters = 4   # Determines the data set used.
-column_number = 8   # This column will be used for the histogram
-use_density = False   # Normalization is used if use_density is True
+n_clusters = 4   # Determines the data set used
+column_number = 5   # This column will be used for the histogram
+use_density = True   # Normalization is used if use_density is True
 bins = 16
 
 # Select the input file 
 print(f"Making plots for {n_clusters} clusters\n")
-input_file = Path(f"../../data/kmeans_result/cyfeatures_{n_clusters}clusters_new.csv")
+# input_file = Path(f"../../data/kmeans_result/cyfeatures_{n_clusters}clusters_new.csv")
+input_file = Path(f"../../data/kmeans_result/cyfeatures_{n_clusters}clusters_PCA_new.csv")
 
 # Load data
 df = pd.read_csv(input_file)
