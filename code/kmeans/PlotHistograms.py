@@ -11,8 +11,8 @@ show_plots = False
 
 # Select the input file 
 print(f"Making plots for {n_clusters} clusters\n")
-input_file = Path(f"../../data/kmeans_result/cyfeatures_{n_clusters}clusters_new.csv")
-# input_file = Path(f"../../data/kmeans_result/cyfeatures_{n_clusters}clusters_PCA_new.csv")
+# input_file = Path(f"../../data/kmeans_result/cyfeatures_{n_clusters}clusters_new.csv")
+input_file = Path(f"../../data/kmeans_result/cyfeatures_{n_clusters}clusters_PCA_new.csv")
 
 # Load data
 df = pd.read_csv(input_file)
@@ -55,12 +55,12 @@ for cur_col in range(1,len(df.columns)-3):
     # Save plot
     if save_plots:
         if not use_density:
-            cur_outfile = Path("../../data/kmeans_result/histogram_{}clusters_{}.png"
+            cur_outfile = Path("../../data/kmeans_result/histograms/histogram_{}clusters_{}.png"
                         .format(n_clusters, df.columns[cur_col]).replace(" ", "_").replace("#", "N").replace("$", "").replace("\\", ""))
             print("Saving: {}".format(cur_outfile))
             plt.savefig(cur_outfile)
         else:
-            cur_outfile = Path("../../data/kmeans_result/histogram_normalized_{}clusters_{}.png"
+            cur_outfile = Path("../../data/kmeans_result/histograms/histogram_normalized_{}clusters_{}.png"
                         .format(n_clusters, df.columns[cur_col]).replace(" ", "_").replace("#", "N").replace("$", "").replace("\\", ""))
             print("Saving: {}".format(cur_outfile))
             plt.savefig(cur_outfile)
