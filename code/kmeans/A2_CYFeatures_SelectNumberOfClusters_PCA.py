@@ -13,6 +13,7 @@ method = 'kmedoids'   # Should be chosen from ['kmeans', 'kmedoids'].
 num_clusters = 20   # Number of clusters to create.
 num_rows = 30   # Number of representative rows to select.
 input_file = Path("../../data/features_output_selection_Years.csv")
+output_file = Path("../../data/kmeans_result/cyfeatures_number_of_clusters_graph_PCA.png")
 N_pca_components = 6 # Number of PCA components to use
 
 # Load data
@@ -22,8 +23,8 @@ df = pd.read_csv(input_file)
 if 'ModelName_1' in df.columns:
     df.drop(columns='ModelName_1', inplace=True)
 
-# sub set selection for target year: 2050
-# select years: form 2036 to 2065
+# Subset selection for target year: 2050
+# Select years: form 2036 to 2065
 years_2036__2065 = [i for i in range(2036, 2066)]
 df_target_2050 = df[df['Year'].isin(years_2036__2065)]
 
@@ -60,7 +61,7 @@ with pd.option_context('display.max_rows', 100,
                        'display.precision', 8,
                        ):
     print(df)
-""";
+"""
 
 first_column_is_string = df.iloc[:, 0].apply(lambda x: isinstance(x, str)).all()
 print(f"First column contains only strings: {first_column_is_string}")
@@ -91,6 +92,9 @@ plt.xticks(range(2, num_clusters+1))
 plt.title("With {} PCs".format(N_pca_components))
 plt.xlabel("Number of clusters")
 plt.ylabel("Sum of squared distances")
-plt.savefig("../../data/kmeans_result/cyfeatures_number_of_clusters_graph_PCA.png")
-plt.show()
 
+# Save plot
+print(f"Saving: {output_file}")
+plt.savefig(output_file)
+
+plt.show()

@@ -1,13 +1,12 @@
 from pathlib import Path
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 
-# Settings.
+# Settings
 input_file = Path("../../data/features_output_selection_Years.csv")
-
+output_file = Path("../../data/kmeans_result/graph2select_number_of_PCA_components.png")
 # Load data
 df = pd.read_csv(input_file)
 
@@ -15,8 +14,8 @@ df = pd.read_csv(input_file)
 if 'ModelName_1' in df.columns:
     df.drop(columns='ModelName_1', inplace=True)
 
-# sub set selection for target year: 2050
-# select years: form 2036 to 2065
+# Subset selection for target year: 2050
+# Select years: form 2036 to 2065
 years_2036__2065 = [i for i in range(2036, 2066)]
 df_target_2050 = df[df['Year'].isin(years_2036__2065)]
 
@@ -33,10 +32,15 @@ df_scaled = pd.DataFrame(StandardScaler().fit_transform(df_target_2050[df_target
 pca = PCA(n_components=10)
 pca.fit(df_scaled)
 
+# Make plot
 plt.figure(figsize=(10,8))
 plt.plot(range(1,11), pca.explained_variance_ratio_.cumsum(), marker='o', linestyle='--')
 plt.title("Explained Variance by Components")
 plt.xlabel("Number of Components")
 plt.ylabel("Cumulative Explained Variance")
-plt.savefig("../../data/kmeans_result/graph2select_number_of_PCA_components.png")
+
+# Save plot
+print(f"Saving: {output_file}")
+plt.savefig(output_file)
+
 plt.close()
