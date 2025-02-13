@@ -4,7 +4,6 @@ import pandas as pd
 import warnings
 from sklearn.cluster import KMeans
 from sklearn_extra.cluster import KMedoids
-import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 
