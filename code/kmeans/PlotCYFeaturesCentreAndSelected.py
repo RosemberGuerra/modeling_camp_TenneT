@@ -76,7 +76,7 @@ for comb in column_combs:
     plt.tight_layout()
 
     # Save the plots
-    cur_output_file = Path("../../data/kmeans_result/clusterplot_{}clusters_{}_vs_{}.png"
+    cur_output_file = Path("../../data/kmeans_result/clusterplots/clusterplot_{}clusters_{}_vs_{}.png"
                            .format(n_clusters, plotx.replace(" ", "_").replace("#", "N").replace("$", ""),
                                    ploty.replace(" ", "_").replace("#", "N").replace("$", "")))
 
