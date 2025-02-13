@@ -10,11 +10,12 @@ from sklearn.decomposition import PCA
 from PointDistributor import point_distributor
 
 
-# Settings.
+# Settings
 method = 'kmedoids'   # Should be chosen from ['kmeans', 'kmedoids'].
 num_clusters = 4   # Number of clusters to create.
 num_rows = 30   # Number of representative rows to select.
 input_file = Path("../../data/features_output_selection_Years.csv")
+output_file = Path("../../data/kmeans_result/cyfeatures_{}clusters_PCA_new.csv".format(num_clusters))
 N_pca_components = 6 # Number of PCA components to use
 
 # Load data
@@ -113,15 +114,22 @@ def select_points_based_on_cluster_size(in_df, in_num_rows, in_useseed=False, in
     cluster_weights = list(np.array(cluster_sizes)/total_cluster_size)
     points_per_cluster = point_distributor(cluster_weights, in_num_rows)
     
+    # Select the centroid and, if needed, random other cluster points
     for i, (cluster, group) in enumerate(cur_df.groupby('cluster')):
         if points_per_cluster[i] > 0:
-            selected_sample = group.sample(n=points_per_cluster[i])
-            cur_df.loc[selected_sample.index, 'selected'] = True
+            cur_centroid_row = group[group['is_centroid'] == True].iloc[0]
+            cur_df.loc[cur_centroid_row.name, 'selected'] = True
+            remaining_points = points_per_cluster[i] - 1
+            if remaining_points > 0:
+                remaining_group = group[group['is_centroid'] == False]
+                selected_sample = remaining_group.sample(n=remaining_points)
+                cur_df.loc[selected_sample.index, 'selected'] = True
 
     return cur_df
 
 df_N_selected = select_points_based_on_cluster_size(df_N, num_rows)
 
-df_N.drop(columns=['distance_to_centroid'], inplace=True)
-output_file = Path("../../data/kmeans_result/cyfeatures_{}clusters_PCA.csv".format(num_clusters))
-df_N.to_csv(output_file, index=False)
+df_N_selected.drop(columns=['distance_to_centroid'], inplace=True)
+
+print(f"Saving to: {output_file}")
+df_N_selected.to_csv(output_file, index=False)
